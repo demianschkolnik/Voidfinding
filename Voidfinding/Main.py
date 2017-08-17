@@ -30,9 +30,9 @@ def distance(x1,y1,x2,y2):
    return (deltaXSquare+deltaYSquare) ** (0.5)
 
 
-epsilon    = 100 #epsilon is the distance to check for neighbours
-k          = 8 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_1024.dat' #File to be read
+epsilon    = 200 #epsilon is the distance to check for neighbours
+k          = 4 #k is the number on the epsilon-neighborhood criterion
+file       = 'Data/basic_set_3_squares_1.dat' #File to be read
 plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 
