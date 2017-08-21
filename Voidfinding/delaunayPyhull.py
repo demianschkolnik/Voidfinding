@@ -1,1 +1,1 @@
-from pyhull.delaunay import DelaunayTri
+import pyhull as pu

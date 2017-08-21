@@ -29,10 +29,10 @@ def distance(x1,y1,x2,y2):
    deltaYSquare = (y1-y2)**2
    return (deltaXSquare+deltaYSquare) ** (0.5)
 
-
+manualEpsilon = False #Manual epsilon or calculated
 epsilon    = 200 #epsilon is the distance to check for neighbours
-k          = 4 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/basic_set_3_squares_1.dat' #File to be read
+k          = 12 #k is the number on the epsilon-neighborhood criterion
+file       = 'Data/20irr2d_1024.dat' #File to be read
 plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 
@@ -65,6 +65,17 @@ for i in range(0,l):
        dist = distance(raw[i,0],raw[i,1],raw[j,0],raw[j,1])
        M[i,j] = dist
        M[j,i] = dist
+
+
+#calculate epsilon depending on k: epsilon is de mean distance of the kth neighbour.
+def epsilonForK(k,M,l):
+    kNearest = []
+    for i in range(0,l):
+        kNearest.append(sorted(M[i])[k+1])
+    return np.mean(kNearest)
+
+if not manualEpsilon:
+    epsilon = epsilonForK(k,M,l)
 
 #Ids
 center = []
