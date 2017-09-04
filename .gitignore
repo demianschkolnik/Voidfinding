@@ -1,5 +1,6 @@
 
 .idea/misc.xml
+<<<<<<< HEAD
 
 .idea/modules.xml
 
@@ -16,3 +17,10 @@ Voidfinding/__pycache__/plotDelaunay.cpython-35.pyc
 *.pyc
 
 *.pyc
+=======
+.idea/modules.xml
+.idea/vcs.xml
+.idea/Voidfinding.iml
+.idea/workspace.xml
+Voidfinding/__pycache__/plotPoints.cpython-35.pyc
+>>>>>>> origin/master
