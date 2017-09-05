@@ -51,7 +51,7 @@ def plotWithEpsilonNeighbour(name, centerPointsPython, outlierPointsPython, bord
 
     plt.show()
 
-def saveWithEpsilonNeighbour(name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points):
+def saveWithEpsilonNeighbour(folderName, name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points):
     centerPointsNP = np.array(centerPointsPython)
     outlierPointsNP = np.array(outlierPointsPython)
     borderPointsNP = np.array(borderPointsPython)
@@ -78,5 +78,5 @@ def saveWithEpsilonNeighbour(name, centerPointsPython, outlierPointsPython, bord
     plt.xlim(-1050, 1050)
     plt.ylim(-1050, 1050)
 
-    saveFile = 'Figures/figure' + name +'.png'
-    plt.savefig(saveFile, bbox_inches='tight')
+    saveFile = 'Figures/' + folderName + '/' + name +'.png'
+    plt.savefig(saveFile, bbox_inches='tight', dpi=400 )
