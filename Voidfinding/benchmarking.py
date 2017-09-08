@@ -78,8 +78,6 @@ if __name__ == '__main__':
 
     file = open('results.txt', 'w')
 
-
-
     for file in files:
         run = "test(\"Data/"+file+"\")"
         result = (timeit.timeit(run, setup="from __main__ import test",number=1))
