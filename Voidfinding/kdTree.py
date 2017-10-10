@@ -3,12 +3,15 @@ import numpy as np
 import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
-epsilon    = 30 #epsilon is the distance to check for neighbours
-k          = 10 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_16384.dat' #File to be read
+epsilon    = 70 #epsilon is the distance to check for neighbours
+k          = 9 #k is the number on the epsilon-neighborhood criterion
+file       = 'Data/20irr2d_2048.dat' #File to be read
 plot = True #Plot?
-plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
+plotNearestNeighbour = False #Plot lines to epsilon-neighbours?
 printProgress = True #Print % of progress on console?
+justPlotBorder = False
+justPlotCenter = False
+
 
 #Parse de read data
 f = open(file, 'r')
@@ -55,12 +58,12 @@ borderPointsPython = []
 neighbourEdge_points = []
 neighbour_edges = set()
 
-def add_edge(i, j):
+def add_edge(i, j, data):
     """Add a line between the i-th and j-th points, if not in the list already"""
     if (i, j) in neighbour_edges or (j, i) in neighbour_edges:
         return
     neighbour_edges.add((i, j))
-    neighbourEdge_points.append(raw[ [i, j] ])
+    neighbourEdge_points.append(data[ [i, j] ])
 
 new = ''
 #check for center objects.
@@ -72,16 +75,41 @@ for i in range(0,l):
            print(new+"%")
 
    epsNeighbors = tree.query_ball_point(points[i],epsilon)
-   if plotNearestNeighbour:
-       for ne in epsNeighbors:
-           if i != ne:
-            add_edge(i, ne)
+
+   wasCenter = False
    if len(epsNeighbors) >= (k+1): #kd tree counts itself!
        centerPointsPython.append(raw[i].tolist())
        center.append(i)
+       wasCenter = True
    else:
        candidates.append(i)
        candidatesPointsPython.append(raw[i].tolist())
+
+   if justPlotBorder:
+       if plotNearestNeighbour:
+           for ne in epsNeighbors:
+               if i != ne and not wasCenter:
+                   add_edge(i, ne, raw)
+   elif not justPlotCenter:
+       if plotNearestNeighbour:
+           for ne in epsNeighbors:
+               if i != ne:
+                   add_edge(i, ne, raw)
+
+#plot just centers
+if justPlotCenter:
+    tree2 = spatial.KDTree(centerPointsPython)
+    for j in range(0,len(centerPointsPython)):
+        if printProgress:
+            por = str(int((j / len(centerPointsPython)) * 100))
+            if (por != new):
+                new = por
+                print(new + "%")
+
+        epsNeighbors2 = tree2.query_ball_point(centerPointsPython[j],epsilon)
+        for ne in epsNeighbors2:
+            if j != ne:
+                add_edge(j, ne, np.array(centerPointsPython))
 
 #Move candidates from outlier to border
 for cand in candidates:
@@ -95,6 +123,14 @@ for cand in candidates:
    if not wasBorder:
        outlier.append(cand)
        outlierPointsPython.append(raw[cand].tolist())
+
+#TEST
+if justPlotBorder:
+    centerPointsPython = []
+    outlierPointsPython = []
+elif justPlotCenter:
+    outlierPointsPython = []
+    borderPointsPython = []
 
 if plot:
     plotName = 'Technique:KDTree '+'Data:' + file + ' | epsilon:' + str(epsilon) + ' | k:' + str(k)

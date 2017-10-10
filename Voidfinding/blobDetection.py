@@ -2,7 +2,7 @@ import cv2
 import numpy as np;
 
 # Read image
-im = cv2.imread("Figures/kdTree 16k eps-30 k-9.png", cv2.IMREAD_GRAYSCALE)
+im = cv2.imread("Figures/croppedIMG.png", cv2.IMREAD_GRAYSCALE)
 
 # Setup SimpleBlobDetector parameters.
 params = cv2.SimpleBlobDetector_Params()
@@ -13,14 +13,14 @@ params.maxThreshold = 200
 
 # Filter by Area.
 params.filterByArea = True
-params.minArea = 500
+params.minArea = 1000
 
 # Filter by Circularity
 params.filterByCircularity = False
 params.minCircularity = 0.1
 
 # Filter by Convexity
-params.filterByConvexity = True
+params.filterByConvexity = False
 params.minConvexity = 0.3
 
 # Filter by Inertia

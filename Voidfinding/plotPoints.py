@@ -10,9 +10,9 @@ def plot(name, centerPointsPython, outlierPointsPython, borderPointsPython):
 
     plt.figure()
     plt.title(name)
-    plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], 'ko', markersize=1.2, color='blue', label="Border Points")
-    plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], 'ko', markersize=1.2, color='cyan', label="Center Points")
-    plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'ko', markersize=1.2, color='green', label="Outlier Points")
+    plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], 'ko', markersize=1, color='blue', label="Border Points")
+    plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], 'ko', markersize=1, color='cyan', label="Center Points")
+    plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'ko', markersize=1, color='green', label="Outlier Points")
 
     plt.legend(loc=4, fontsize='small')
 
