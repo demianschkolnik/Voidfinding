@@ -5,7 +5,7 @@ import plotPoints as pp
 manualEpsilon = False #Manual epsilon or calculated
 epsilon    = 30 #epsilon is the distance to check for neighbours
 k          = 9 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_16384.dat' #File to be read
+file       = 'Data/20irr2d_4096.dat' #File to be read
 gen        = 4 #Generation of neighbors on delaunay
 
 plot = True #Plot?
@@ -98,8 +98,8 @@ for p in range(len(points)):
         dist = distance(points[p][0],points[p][1],points[n][0],points[n][1])
         if (dist <= epsilon):
             nrNeigh += 1
-            if plotNearestNeighbour:
-                add_edge(p, n)
+            #if plotNearestNeighbour:
+                #add_edge(p, n)
     if nrNeigh >= k:
         centerPointsPython.append(raw[p].tolist())
         center.append(p)
@@ -119,6 +119,18 @@ for cand in candidates:
     if not wasBorder:
         outlier.append(cand)
         outlierPointsPython.append(raw[cand].tolist())
+
+#generate edges
+for t in tri.neighbors:
+    if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[1] >= len(points):
+        continue
+    print(points[t[0]])
+    print(centerPointsPython[2])
+    if points[t[0]] in centerPointsPython and points[t[1]] in centerPointsPython and points[t[2]] in centerPointsPython:
+        add_edge(t[0], t[1])
+        add_edge(t[0], t[2])
+        add_edge(t[1], t[2])
+        print("Added!")
 
 if plot:
     plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(epsilon) + ' | k:' + str(k)
