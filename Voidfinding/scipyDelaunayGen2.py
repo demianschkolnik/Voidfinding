@@ -3,8 +3,8 @@ from scipy.spatial import Delaunay
 import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
-epsilon    = 30 #epsilon is the distance to check for neighbours
-k          = 9 #k is the number on the epsilon-neighborhood criterion
+epsilon    = 50 #epsilon is the distance to check for neighbours
+k          = 7 #k is the number on the epsilon-neighborhood criterion
 file       = 'Data/20irr2d_4096.dat' #File to be read
 gen        = 4 #Generation of neighbors on delaunay
 
@@ -12,7 +12,6 @@ plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 save = False #save as image?
 printProgress = True #Print % of progress on console?
-
 
 def distance(x1,y1,x2,y2):
    "distance between (x1,y1) and (x2,y2)"
@@ -74,10 +73,13 @@ outlierPointsPython = []
 candidatesPointsPython = []
 borderPointsPython = []
 
-neighbourEdge_points = []
-neighbour_edges = set()
+neighbourEdge_points_center = []
+neighbour_edges_center = set()
 
-def add_edge(i, j):
+neighbourEdge_points_border = []
+neighbour_edges_border = set()
+
+def add_edge(i, j, neighbour_edges,neighbourEdge_points):
     """Add a line between the i-th and j-th points, if not in the list already"""
     if (i, j) in neighbour_edges or (j, i) in neighbour_edges:
         return
@@ -120,27 +122,50 @@ for cand in candidates:
         outlier.append(cand)
         outlierPointsPython.append(raw[cand].tolist())
 
+
+p = 0
+new = 1
+
 #generate edges
-for t in tri.neighbors:
-    if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[1] >= len(points):
+print("Adding Edges")
+for t in tri.simplices:
+    if printProgress:
+        por = str(int((p / len(tri.simplices)) * 100))
+        if (por != new):
+            new = por
+            print(new + "%")
+        p += 1
+    if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[2] >= len(points):
         continue
-    print(points[t[0]])
-    print(centerPointsPython[2])
-    if points[t[0]] in centerPointsPython and points[t[1]] in centerPointsPython and points[t[2]] in centerPointsPython:
-        add_edge(t[0], t[1])
-        add_edge(t[0], t[2])
-        add_edge(t[1], t[2])
-        print("Added!")
+    if (points[t[0]] in centerPointsPython) and \
+            (points[t[1]] in centerPointsPython) and \
+            (points[t[2]] in centerPointsPython):
+        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon:
+            add_edge(t[0], t[1],neighbour_edges_center,neighbourEdge_points_center)
+        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+            add_edge(t[0], t[2],neighbour_edges_center,neighbourEdge_points_center)
+        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+            add_edge(t[1], t[2],neighbour_edges_center,neighbourEdge_points_center)
+
+    if (points[t[0]] in borderPointsPython) and (points[t[1]] in borderPointsPython):
+        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon:
+            add_edge(t[0], t[1],neighbour_edges_border,neighbourEdge_points_border)
+    if (points[t[0]] in borderPointsPython) and (points[t[2]] in borderPointsPython):
+        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+            add_edge(t[0], t[2],neighbour_edges_border,neighbourEdge_points_border)
+    if (points[t[1]] in borderPointsPython) and (points[t[2]] in borderPointsPython):
+        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+            add_edge(t[1], t[2],neighbour_edges_border,neighbourEdge_points_border)
 
 if plot:
     plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(epsilon) + ' | k:' + str(k)
     if save:
         plotName = 'TechniqueDelaunay '+'Data_' + str(len(points)) + '_epsilon:' + str(epsilon) + '_k:' + str(k)
         pp.saveWithEpsilonNeighbour('Delaunay',plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
-                                    neighbourEdge_points)
+                                    neighbourEdge_points_center)
     elif plotNearestNeighbour:
         pp.plotWithEpsilonNeighbour(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
-                                    neighbourEdge_points)
+                                    neighbourEdge_points_center, neighbourEdge_points_border)
     else:
         pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
 
