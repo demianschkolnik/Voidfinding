@@ -12,6 +12,8 @@ plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 save = False #save as image?
 printProgress = True #Print % of progress on console?
+removeOutliersFromGraph = True
+drawConvexHull = True
 
 def distance(x1,y1,x2,y2):
    "distance between (x1,y1) and (x2,y2)"
@@ -137,14 +139,17 @@ for t in tri.simplices:
         p += 1
     if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[2] >= len(points):
         continue
-    if (points[t[0]] in centerPointsPython) and \
-            (points[t[1]] in centerPointsPython) and \
+    if (points[t[0]] in centerPointsPython) or \
+            (points[t[1]] in centerPointsPython) or \
             (points[t[2]] in centerPointsPython):
-        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon:
+        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon and \
+                not (points[t[0]] in outlierPointsPython or points[t[1]] in outlierPointsPython):
             add_edge(t[0], t[1],neighbour_edges_center,neighbourEdge_points_center)
-        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon and \
+                not (points[t[0]] in outlierPointsPython or points[t[2]] in outlierPointsPython):
             add_edge(t[0], t[2],neighbour_edges_center,neighbourEdge_points_center)
-        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
+        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon and \
+                not (points[t[1]] in outlierPointsPython or points[t[2]] in outlierPointsPython):
             add_edge(t[1], t[2],neighbour_edges_center,neighbourEdge_points_center)
 
     if (points[t[0]] in borderPointsPython) and (points[t[1]] in borderPointsPython):
@@ -157,6 +162,13 @@ for t in tri.simplices:
         if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
             add_edge(t[1], t[2],neighbour_edges_border,neighbourEdge_points_border)
 
+if drawConvexHull:
+    for i in tri.convex_hull:
+        add_edge(i[0],i[1],neighbour_edges_center,neighbourEdge_points_center)
+
+if removeOutliersFromGraph:
+    outlierPointsPython = []
+
 if plot:
     plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(epsilon) + ' | k:' + str(k)
     if save:
@@ -164,7 +176,7 @@ if plot:
         pp.saveWithEpsilonNeighbour('Delaunay',plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
                                     neighbourEdge_points_center)
     elif plotNearestNeighbour:
-        pp.plotWithEpsilonNeighbour(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
+        pp.plotWithEpsilonNeighbour2Edges(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
                                     neighbourEdge_points_center, neighbourEdge_points_border)
     else:
         pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
