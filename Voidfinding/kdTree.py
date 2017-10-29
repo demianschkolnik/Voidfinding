@@ -3,14 +3,14 @@ import numpy as np
 import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
-epsilon    = 70 #epsilon is the distance to check for neighbours
+epsilon    = 100 #epsilon is the distance to check for neighbours
 k          = 9 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_2048.dat' #File to be read
+file       = 'Data/20irr2d_4096.dat' #File to be read
 plot = True #Plot?
-plotNearestNeighbour = False #Plot lines to epsilon-neighbours?
+plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 printProgress = True #Print % of progress on console?
 justPlotBorder = False
-justPlotCenter = False
+justPlotCenter = True
 
 
 #Parse de read data

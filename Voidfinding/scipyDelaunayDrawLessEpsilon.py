@@ -3,8 +3,8 @@ from scipy.spatial import Delaunay
 import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
-epsilon    = 50 #epsilon is the distance to check for neighbours
-file       = 'Data/20irr2d_4096.dat' #File to be read
+epsilon    = 60 #epsilon is the distance to check for neighbours
+file       = 'Data/20irr2d_8192.dat' #File to be read
 
 plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
@@ -88,7 +88,7 @@ if plot:
         plotName = 'TechniqueDelaunay '+'Data_' + str(len(points)) + '_epsilon:' + str(epsilon)
         pp.saveWithEpsilonNeighbour('Delaunay',plotName, points, neighbourEdge_points)
     else:
-        pp.plotWithEpsilonNeighbour(plotName, points, neighbourEdge_points)
+        pp.plotWithEpsilonNeighbourSingle(plotName, points, neighbourEdge_points)
 
 
 

@@ -3,9 +3,9 @@ from scipy.spatial import Delaunay
 import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
-epsilon    = 50 #epsilon is the distance to check for neighbours
-k          = 7 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_4096.dat' #File to be read
+epsilon    = 100 #epsilon is the distance to check for neighbours
+k          = 15 #k is the number on the epsilon-neighborhood criterion
+file       = 'Data/20irr2d_2048.dat' #File to be read
 gen        = 4 #Generation of neighbors on delaunay
 
 plot = True #Plot?
@@ -15,13 +15,21 @@ printProgress = True #Print % of progress on console?
 removeOutliersFromGraph = True
 drawConvexHull = True
 
-def distance(x1,y1,x2,y2):
+def distance4(x1,y1,x2,y2):
    "distance between (x1,y1) and (x2,y2)"
    deltaXSquare = (x1-x2)**2
    deltaYSquare = (y1-y2)**2
    return (deltaXSquare+deltaYSquare) ** (0.5)
 
+def distance(a,b):
+   "distance between point a and b"
+   deltaXSquare = (a[0]-b[0])**2
+   deltaYSquare = (a[1]-b[1])**2
+   return (deltaXSquare+deltaYSquare) ** (0.5)
+
 points = []
+
+void_triangles = []
 
 #Parse de read data
 f = open(file, 'r')
@@ -99,7 +107,7 @@ for p in range(len(points)):
 
     nrNeigh = 0
     for n in find_neighborsGen(p,tri,gen):
-        dist = distance(points[p][0],points[p][1],points[n][0],points[n][1])
+        dist = distance4(points[p][0],points[p][1],points[n][0],points[n][1])
         if (dist <= epsilon):
             nrNeigh += 1
             #if plotNearestNeighbour:
@@ -115,7 +123,7 @@ for p in range(len(points)):
 for cand in candidates:
     wasBorder = False
     for c in center:
-        if distance(points[cand][0],points[cand][1],points[c][0], points[c][1]) <= epsilon:
+        if distance4(points[cand][0],points[cand][1],points[c][0], points[c][1]) <= epsilon:
             border.append(cand)
             borderPointsPython.append(raw[cand].tolist())
             wasBorder = True
@@ -137,30 +145,34 @@ for t in tri.simplices:
             new = por
             print(new + "%")
         p += 1
+
+    edges_added = 0
     if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[2] >= len(points):
         continue
-    if (points[t[0]] in centerPointsPython) or \
-            (points[t[1]] in centerPointsPython) or \
-            (points[t[2]] in centerPointsPython):
-        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon and \
-                not (points[t[0]] in outlierPointsPython or points[t[1]] in outlierPointsPython):
-            add_edge(t[0], t[1],neighbour_edges_center,neighbourEdge_points_center)
-        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon and \
-                not (points[t[0]] in outlierPointsPython or points[t[2]] in outlierPointsPython):
-            add_edge(t[0], t[2],neighbour_edges_center,neighbourEdge_points_center)
-        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon and \
-                not (points[t[1]] in outlierPointsPython or points[t[2]] in outlierPointsPython):
-            add_edge(t[1], t[2],neighbour_edges_center,neighbourEdge_points_center)
+    a,b,c = points[t[0]],points[t[1]],points[t[2]],
 
-    if (points[t[0]] in borderPointsPython) and (points[t[1]] in borderPointsPython):
-        if distance(points[t[0]][0],points[t[0]][1],points[t[1]][0],points[t[1]][1]) <= epsilon:
-            add_edge(t[0], t[1],neighbour_edges_border,neighbourEdge_points_border)
-    if (points[t[0]] in borderPointsPython) and (points[t[2]] in borderPointsPython):
-        if distance(points[t[0]][0],points[t[0]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
-            add_edge(t[0], t[2],neighbour_edges_border,neighbourEdge_points_border)
-    if (points[t[1]] in borderPointsPython) and (points[t[2]] in borderPointsPython):
-        if distance(points[t[1]][0],points[t[1]][1],points[t[2]][0],points[t[2]][1]) <= epsilon:
-            add_edge(t[1], t[2],neighbour_edges_border,neighbourEdge_points_border)
+    if distance(a,b) <= epsilon and not (a in outlierPointsPython or b in outlierPointsPython):
+        if a in borderPointsPython and b in borderPointsPython:
+            add_edge(t[0], t[1], neighbour_edges_border, neighbourEdge_points_border)
+        else:
+            add_edge(t[0], t[1], neighbour_edges_center, neighbourEdge_points_center)
+        edges_added += 1
+
+    if distance(a,c) <= epsilon and not (a in outlierPointsPython or c in outlierPointsPython):
+        if a in borderPointsPython and c in borderPointsPython:
+            add_edge(t[0], t[2], neighbour_edges_border, neighbourEdge_points_border)
+        else:
+            add_edge(t[0], t[2], neighbour_edges_center, neighbourEdge_points_center)
+        edges_added += 1
+    if distance(b,c) <= epsilon and not (b in outlierPointsPython or c in outlierPointsPython):
+        if b in borderPointsPython and c in borderPointsPython:
+            add_edge(t[1], t[2], neighbour_edges_border, neighbourEdge_points_border)
+        else:
+            add_edge(t[1], t[2], neighbour_edges_center, neighbourEdge_points_center)
+        edges_added += 1
+
+    if(edges_added<3):
+        void_triangles.append((a,b,c))
 
 if drawConvexHull:
     for i in tri.convex_hull:
@@ -168,6 +180,7 @@ if drawConvexHull:
 
 if removeOutliersFromGraph:
     outlierPointsPython = []
+
 
 if plot:
     plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(epsilon) + ' | k:' + str(k)
@@ -177,7 +190,7 @@ if plot:
                                     neighbourEdge_points_center)
     elif plotNearestNeighbour:
         pp.plotWithEpsilonNeighbour2Edges(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
-                                    neighbourEdge_points_center, neighbourEdge_points_border)
+                                    neighbourEdge_points_center, neighbourEdge_points_border, void_triangles)
     else:
         pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
 
