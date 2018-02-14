@@ -4,9 +4,9 @@ import plotPoints as pp
 
 manualEpsilon = False #Manual epsilon or calculated
 epsilon    = 100 #epsilon is the distance to check for neighbours
-k          = 15 #k is the number on the epsilon-neighborhood criterion
-file       = 'Data/20irr2d_2048.dat' #File to be read
-gen        = 4 #Generation of neighbors on delaunay
+k          = 20 #k is the number on the epsilon-neighborhood criterion
+file       = 'Data/30sphere2d_5000.dat' #File to be read
+gen        = 2 #Generation of neighbors on delaunay
 
 plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
