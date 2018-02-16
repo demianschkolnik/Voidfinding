@@ -1,8 +1,9 @@
 import cv2
 from random import randint
 
-def fill(img_file_input, img_file_output, threshold=10000):
-    print('Filling:' + img_file_input)
+def fill(img_file_input, img_file_output, threshold=10000, printProgress=True):
+    if printProgress:
+        print('Filling:' + img_file_input)
     img = cv2.imread(img_file_input, cv2.IMREAD_COLOR)           # rgb
 
     # alpha_img = cv2.imread(img_file, cv2.IMREAD_UNCHANGED) # rgba
@@ -49,11 +50,13 @@ def fill(img_file_input, img_file_output, threshold=10000):
             paint(img,voidPoints,(r,g,b))
 
     new = 1
+
     for i in range(0,img.shape[0]):
         por = str(int((i / img.shape[0]) * 100))
         if (por != new):
             new = por
-            print(new + "%")
+            if printProgress:
+                print(new + "%")
         for j in range(0,img.shape[1]):
             colorize(img,i,j)
 

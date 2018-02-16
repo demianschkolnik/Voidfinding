@@ -2,9 +2,9 @@ from scipy import spatial
 import numpy as np
 import plotPoints as pp
 
-def kdTreeFinder(epsilon, k, file ):
+def kdTreeFinder(epsilon, k, file, printProgress ):
 
-    printProgress = True #Print % of progress on console?
+    #Print % of progress on console?
 
     #Parse de read data
     f = open(file, 'r')
@@ -60,27 +60,34 @@ def kdTreeFinder(epsilon, k, file ):
 
     new = ''
     #check for center objects.
+    if printProgress:
+        print("Checking for center Objects")
+
     for i in range(0,l):
+
        if printProgress:
-           por =  str(int((i/l)*100))
+           por = str(int((i / l) * 100))
            if(por != new):
                new = por
                print(new+"%")
 
        epsNeighbors = tree.query_ball_point(points[i],epsilon)
 
-       wasCenter = False
        if len(epsNeighbors) >= (k+1): #kd tree counts itself!
            centerPointsPython.append(raw[i].tolist())
            center.append(i)
-           wasCenter = True
+
        else:
            candidates.append(i)
            candidatesPointsPython.append(raw[i].tolist())
 
     #plot just centers
+    if printProgress:
+        print("Plotting centers:")
+
     tree2 = spatial.KDTree(centerPointsPython)
     for j in range(0,len(centerPointsPython)):
+
         if printProgress:
             por = str(int((j / len(centerPointsPython)) * 100))
             if (por != new):

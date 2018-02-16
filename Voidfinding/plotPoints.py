@@ -115,7 +115,7 @@ def plotWithEpsilonNeighbourSingle(name, points, edges):
 
     plt.show()
 
-def saveWithEpsilonNeighbour(folderName, name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points):
+def saveWithEpsilonNeighbourBig(folderName, name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points):
     centerPointsNP = np.array(centerPointsPython)
     outlierPointsNP = np.array(outlierPointsPython)
     borderPointsNP = np.array(borderPointsPython)
