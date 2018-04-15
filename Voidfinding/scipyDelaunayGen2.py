@@ -200,9 +200,9 @@ def run(epsilon, k, file, gen, save, printProgress):
 
 if __name__ == '__main__':
     run(
-        epsilon=100,
-        k=20,
-        file='Data/30sphere2d_5000.dat',
+        epsilon=70,
+        k=24,
+        file='Data/NoiseSPhere200R10000P0N.dat',
         gen=2,
         save=False,
         printProgress=True
