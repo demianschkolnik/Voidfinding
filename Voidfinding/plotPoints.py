@@ -53,26 +53,28 @@ def plotWithEpsilonNeighbour(name, centerPointsPython, outlierPointsPython, bord
     plt.show()
 
 def plotWithEpsilonNeighbour2Edges(name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points1,
-                                   edge_points2, polygons):
+                                   edge_points2, polygons,
+                                   color1='blue', color2='cyan', color3='green', color4='black', color5='red'):
     centerPointsNP = np.array(centerPointsPython)
     outlierPointsNP = np.array(outlierPointsPython)
     borderPointsNP = np.array(borderPointsPython)
 
     plt.figure()
     plt.title(name)
-    if len(borderPointsNP) > 0:
-        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], 'ko', markersize=1.2, color='blue', label="Border Points")
-    if len(centerPointsNP) > 0:
-        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], 'ko', markersize=1.2, color='cyan', label="Center Points")
-    if len(outlierPointsNP) > 0:
-        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'ko', markersize=1.2, color='green',
-                 label="Outlier Points")
+    if len(borderPointsNP) > 0 and color1!='none':
+        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], 'ko', markersize=0.2, color=color1)
+    if len(centerPointsNP) > 0 and color2!='none':
+        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], 'ko', markersize=0.2, color=color2)
+    if len(outlierPointsNP) > 0 and color3!='none':
+        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'ko', markersize=0.2, color=color3)
 
-    lines = LineCollection(edge_points1, color='black', linewidths=0.2)
-    plt.gca().add_collection(lines)
+    if color4!='none':
+        lines = LineCollection(edge_points1, color=color4, linewidths=0.2)
+        plt.gca().add_collection(lines)
 
-    lines2 = LineCollection(edge_points2, color='red', linewidths=0.5)
-    plt.gca().add_collection(lines2)
+    if color5 != 'none':
+        lines2 = LineCollection(edge_points2, color=color5, linewidths=0.5)
+        plt.gca().add_collection(lines2)
 
     patches = []
     for p in polygons:

@@ -1,7 +1,16 @@
 import numpy as np
 from scipy.spatial import Delaunay
 import plotPoints as pp
+import time
+#import psutil
+#import os
 
+#def benchmarkMem(init):
+    #MEMORY BENCHMARK
+    #process = psutil.Process(os.getpid())
+    #mem = process.memory_info().rss
+    #mem = mem >> 20
+    #print("mem:"+str(mem))
 
 def run(epsilon, k, file, gen, save, printProgress):
     # Manual epsilon or calculated
@@ -33,6 +42,9 @@ def run(epsilon, k, file, gen, save, printProgress):
     void_triangles = []
 
     # Parse de read data
+    print("Loading Data")
+
+
     f = open(file, 'r')
     i = 0
     first = 0
@@ -55,6 +67,8 @@ def run(epsilon, k, file, gen, save, printProgress):
             i += 1
 
     # Create Delaunay Triangulation
+    print("Create Delaunay Triangulation")
+
     tri = Delaunay(points)
 
     def find_neighbors(pindex, triang):
@@ -100,6 +114,8 @@ def run(epsilon, k, file, gen, save, printProgress):
 
     new = ''
 
+    print("Classifying points")
+
     for p in range(len(points)):
         if printProgress:
             por = str(int((p / l) * 100))
@@ -138,8 +154,8 @@ def run(epsilon, k, file, gen, save, printProgress):
     new = 1
 
     # generate edges
-    if printProgress:
-        print("Adding Edges")
+    print("Adding Edges")
+
     for t in tri.simplices:
         if printProgress:
             por = str(int((p / len(tri.simplices)) * 100))
@@ -183,6 +199,9 @@ def run(epsilon, k, file, gen, save, printProgress):
     if removeOutliersFromGraph:
         outlierPointsPython = []
 
+    #benchmarkMem(initM)
+    print("Finished!:"+str(time.clock()-start))
+
     if plot:
         plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(
             epsilon) + ' | k:' + str(k)
@@ -193,17 +212,23 @@ def run(epsilon, k, file, gen, save, printProgress):
                                            neighbourEdge_points_center)
         elif plotNearestNeighbour:
             pp.plotWithEpsilonNeighbour2Edges(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
-                                              neighbourEdge_points_center, neighbourEdge_points_border, void_triangles)
+                                              neighbourEdge_points_center, neighbourEdge_points_border, void_triangles,
+                                              color1='black', color2='black', color3='black',
+                                              color4='none', color5='none')
         else:
             pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
 
 
 if __name__ == '__main__':
+    start = time.clock()
+    #define initial used memory in mb
+    #mem = psutil.virtual_memory()
+    #initM = mem.used >> 20
     run(
-        epsilon=70,
-        k=24,
-        file='Data/NoiseSPhere200R10000P0N.dat',
+        epsilon=100,
+        k=12,
+        file='Data/NoiseSphere200R10000P75N.dat',
         gen=2,
         save=False,
-        printProgress=True
+        printProgress=False
     )
