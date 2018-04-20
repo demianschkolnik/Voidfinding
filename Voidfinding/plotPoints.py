@@ -62,11 +62,11 @@ def plotWithEpsilonNeighbour2Edges(name, centerPointsPython, outlierPointsPython
     plt.figure()
     plt.title(name)
     if len(borderPointsNP) > 0 and color1!='none':
-        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], 'ko', markersize=0.2, color=color1)
+        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], '.', markersize=0.5, color=color1)
     if len(centerPointsNP) > 0 and color2!='none':
-        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], 'ko', markersize=0.2, color=color2)
+        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], '.', markersize=0.5, color=color2)
     if len(outlierPointsNP) > 0 and color3!='none':
-        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'ko', markersize=0.2, color=color3)
+        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], '.', markersize=0.5, color=color3)
 
     if color4!='none':
         lines = LineCollection(edge_points1, color=color4, linewidths=0.2)

@@ -18,7 +18,8 @@ if __name__ == "__main__":
     ## the necessary platform extensions with platform.extensions
 
     ## Step #2. Obtain a device id for at least one device (accelerator).
-    device = platform.get_devices()[0]
+    device = platform.get_devices()[1]
+    print(platform.get_devices())
 
     ## It would be necessary to add some code to check the check the support for
     ## the necessary device extensions with device.extensions

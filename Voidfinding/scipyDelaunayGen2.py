@@ -42,7 +42,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     void_triangles = []
 
     # Parse de read data
-    print("Loading Data")
+    print("Loading Data"+str(time.clock()-start))
 
 
     f = open(file, 'r')
@@ -67,7 +67,7 @@ def run(epsilon, k, file, gen, save, printProgress):
             i += 1
 
     # Create Delaunay Triangulation
-    print("Create Delaunay Triangulation")
+    print("Create Delaunay Triangulation"+str(time.clock()-start))
 
     tri = Delaunay(points)
 
@@ -114,7 +114,7 @@ def run(epsilon, k, file, gen, save, printProgress):
 
     new = ''
 
-    print("Classifying points")
+    print("Classifying points"+str(time.clock()-start))
 
     for p in range(len(points)):
         if printProgress:
@@ -125,11 +125,14 @@ def run(epsilon, k, file, gen, save, printProgress):
 
         nrNeigh = 0
         for n in find_neighborsGen(p, tri, gen):
+            #paralelizar aca
             dist = distance4(points[p][0], points[p][1], points[n][0], points[n][1])
             if (dist <= epsilon):
                 nrNeigh += 1
                 # if plotNearestNeighbour:
                 # add_edge(p, n)
+                if nrNeigh>=k:
+                    break
         if nrNeigh >= k:
             centerPointsPython.append(raw[p].tolist())
             center.append(p)
@@ -141,6 +144,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     for cand in candidates:
         wasBorder = False
         for c in center:
+            #paralelizar aca
             if distance4(points[cand][0], points[cand][1], points[c][0], points[c][1]) <= epsilon:
                 border.append(cand)
                 borderPointsPython.append(raw[cand].tolist())
@@ -154,7 +158,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     new = 1
 
     # generate edges
-    print("Adding Edges")
+    print("Adding Edges"+str(time.clock()-start))
 
     for t in tri.simplices:
         if printProgress:
@@ -225,10 +229,10 @@ if __name__ == '__main__':
     #mem = psutil.virtual_memory()
     #initM = mem.used >> 20
     run(
-        epsilon=100,
+        epsilon=80,
         k=12,
-        file='Data/NoiseSphere200R10000P75N.dat',
-        gen=2,
+        file='Data/30sphere2d_5000.dat',
+        gen=3,
         save=False,
         printProgress=False
     )
