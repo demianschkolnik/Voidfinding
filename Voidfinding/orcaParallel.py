@@ -2,6 +2,9 @@ import numpy as np
 from scipy.spatial import Delaunay
 import plotPoints as pp
 import time
+import pyopencl as cl
+from pyopencl import array
+import openCLOrca as clo
 #import psutil
 #import os
 
@@ -116,29 +119,46 @@ def run(epsilon, k, file, gen, save, printProgress):
 
     print("Classifying points"+str(time.clock()-start))
 
+    print("Creating numpy arrays" + str(time.clock()-start))
+
+    pythonNeighborMatrix = []
+
+    maxWidth = 0
+
     for p in range(len(points)):
         if printProgress:
             por = str(int((p / l) * 100))
             if (por != new):
                 new = por
                 print(new + "%")
+        neighborsList = find_neighborsGen(p,tri,gen)
 
-        nrNeigh = 0
-        for n in find_neighborsGen(p, tri, gen):
-            #paralelizar aca
-            dist = distance4(points[p][0], points[p][1], points[n][0], points[n][1])
-            if (dist <= epsilon):
-                nrNeigh += 1
-                # if plotNearestNeighbour:
-                # add_edge(p, n)
-                if nrNeigh>=k:
-                    break
-        if nrNeigh >= k:
-            centerPointsPython.append(raw[p].tolist())
-            center.append(p)
-        else:
-            candidates.append(p)
-            candidatesPointsPython.append(raw[p].tolist())
+        if len(neighborsList) > maxWidth:
+            maxWidth = len(neighborsList)
+
+        pythonNeighborMatrix.append(neighborsList)
+
+    lenP = len(points)
+    vector = np.zeros((lenP, 1), cl.array.vec.float2)
+    matrix = np.zeros((lenP, maxWidth), cl.array.vec.float2)
+
+    for p in range(len(points)):
+        vector[p, 0] = (points[p][0], points[p][1])
+        for subP in range(len(pythonNeighborMatrix[p])):
+            matrix[p, subP] = (points[pythonNeighborMatrix[p][subP]][0], points[pythonNeighborMatrix[p][subP]][1])
+
+
+    result = clo.runParallel(vector, matrix, k, epsilon, maxWidth)
+
+    #VALIDATION
+    nrCenters = 0
+    for r in result:
+        if r == 1:
+            nrCenters += 1
+
+    print("nr of centers:" + str(nrCenters))
+
+    #END VALIDATION
 
     # Move candidates from outlier to border
     for cand in candidates:

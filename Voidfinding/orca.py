@@ -140,6 +140,8 @@ def run(epsilon, k, file, gen, save, printProgress):
             candidates.append(p)
             candidatesPointsPython.append(raw[p].tolist())
 
+    print("nr of centers:" + str(len(center)))
+
     # Move candidates from outlier to border
     for cand in candidates:
         wasBorder = False

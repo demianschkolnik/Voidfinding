@@ -2,14 +2,8 @@ import pyopencl as cl
 from pyopencl import array
 import numpy
 
-if __name__ == "__main__":
-    vector = numpy.zeros((1, 1), cl.array.vec.float4)
-    matrix = numpy.zeros((1, 4), cl.array.vec.float4)
-    matrix[0, 0] = (1, 2, 4, 8)
-    matrix[0, 1] = (16, 32, 64, 128)
-    matrix[0, 2] = (3, 6, 9, 12)
-    matrix[0, 3] = (5, 10, 15, 25)
-    vector[0, 0] = (1, 2, 4, 8)
+
+def runParallel(vector, matrix, k, epsilon, ancho):
 
     ## Step #1. Obtain an OpenCL platform.
     platform = cl.get_platforms()[0]
@@ -31,9 +25,7 @@ if __name__ == "__main__":
     ## Step #5. Build the program.
     ## Step #6. Create one or more kernels from the program functions.
 
-    with open("paralelo.cl",'r') as f:
-        data = f.read()
-        program = cl.Program(context,data)
+    program = cl.Program(context, open('paralelo.cl').read()).build()
 
 
     ## Step #7. Create a command queue for the target device.
@@ -43,12 +35,16 @@ if __name__ == "__main__":
     mem_flags = cl.mem_flags
     matrix_buf = cl.Buffer(context, mem_flags.READ_ONLY | mem_flags.COPY_HOST_PTR, hostbuf=matrix)
     vector_buf = cl.Buffer(context, mem_flags.READ_ONLY | mem_flags.COPY_HOST_PTR, hostbuf=vector)
-    matrix_dot_vector = numpy.zeros(4, numpy.float32) #VECTOR DE LARGO N
+
+    matrix_dot_vector = numpy.zeros(vector.shape[0], numpy.int32) #VECTOR DE LARGO N
+
     destination_buf = cl.Buffer(context, mem_flags.WRITE_ONLY, matrix_dot_vector.nbytes)
 
     ## Step #9. Associate the arguments to the kernel with kernel object.
     ## Step #10. Deploy the kernel for device execution.
-    program.isCore(queue, matrix_dot_vector.shape, None, vector_buf, matrix_buf, destination_buf,k, epsilon, ancho)
+
+    program.is_core(queue, matrix_dot_vector.shape , None, vector_buf, matrix_buf, destination_buf,
+                    numpy.int32(k), numpy.float32(epsilon), numpy.int32(ancho))
 
     ## Step #11. Move the kernel’s output data to host memory.
     cl.enqueue_copy(queue, matrix_dot_vector, destination_buf)
@@ -57,4 +53,37 @@ if __name__ == "__main__":
     ## PyOpenCL performs this step for you, and therefore,
     ## you don't need to worry about cleanup code
 
-    print(matrix_dot_vector)
+    return matrix_dot_vector
+
+
+if __name__ == "__main__":
+    vector = numpy.zeros((1, 4), cl.array.vec.float2)
+    matrix = numpy.zeros((4, 4), cl.array.vec.float2)
+    matrix[0, 0] = (0, 1)
+    matrix[0, 1] = (0, 2)
+    matrix[0, 2] = (0, 3)
+    matrix[0, 3] = (0, 4)
+    matrix[1, 0] = (1, 1)
+    matrix[1, 1] = (1, 2)
+    matrix[1, 2] = (1, 3)
+    matrix[1, 3] = (1, 4)
+    matrix[2, 0] = (2, 1)
+    matrix[2, 1] = (2, 2)
+    matrix[2, 2] = (2, 3)
+    matrix[2, 3] = (2, 4)
+    matrix[3, 0] = (3, 1)
+    matrix[3, 1] = (3, 2)
+    matrix[3, 2] = (3, 3)
+    matrix[3, 3] = (3, 4)
+
+    vector[0, 0] = (0, 0)
+    vector[0, 1] = (1, -1)
+    vector[0, 2] = (2, -1)
+    vector[0, 3] = (3, -1)
+
+    k = 2
+    epsilon = 2.0
+    ancho = 4
+
+    result = runParallel(vector, matrix, k, epsilon, ancho)
+    print(result)
