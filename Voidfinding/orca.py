@@ -125,7 +125,6 @@ def run(epsilon, k, file, gen, save, printProgress):
 
         nrNeigh = 0
         for n in find_neighborsGen(p, tri, gen):
-            #paralelizar aca
             dist = distance4(points[p][0], points[p][1], points[n][0], points[n][1])
             if (dist <= epsilon):
                 nrNeigh += 1
@@ -140,13 +139,10 @@ def run(epsilon, k, file, gen, save, printProgress):
             candidates.append(p)
             candidatesPointsPython.append(raw[p].tolist())
 
-    print("nr of centers:" + str(len(center)))
-
     # Move candidates from outlier to border
     for cand in candidates:
         wasBorder = False
         for c in center:
-            #paralelizar aca
             if distance4(points[cand][0], points[cand][1], points[c][0], points[c][1]) <= epsilon:
                 border.append(cand)
                 borderPointsPython.append(raw[cand].tolist())
@@ -231,10 +227,19 @@ if __name__ == '__main__':
     #mem = psutil.virtual_memory()
     #initM = mem.used >> 20
     run(
-        epsilon=80,
-        k=12,
-        file='Data/30sphere2d_5000.dat',
-        gen=3,
+        epsilon=1000,
+        k=1,
+        file='Data/30sphere2d_100000.dat',
+        gen=4,
         save=False,
-        printProgress=False
+        printProgress=True
     )
+
+    # run(
+    #     epsilon=70,
+    #     k=14,
+    #     file='Data/30sphere2d_100000.dat',
+    #     gen=4,
+    #     save=False,
+    #     printProgress=False
+    # )
