@@ -5,17 +5,17 @@ import time
 import pyopencl as cl
 from pyopencl import array
 import openCLOrca as clo
-#import psutil
-#import os
+import psutil
+import os
 
-#def benchmarkMem(init):
+def benchmarkMem(init):
     #MEMORY BENCHMARK
-    #process = psutil.Process(os.getpid())
-    #mem = process.memory_info().rss
-    #mem = mem >> 20
-    #print("mem:"+str(mem))
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info().rss
+    mem = mem >> 20
+    print("mem:"+str(mem))
 
-def run(epsilon, k, file, gen, save, printProgress):
+def run(epsilon, k, file, save, printProgress):
     # Manual epsilon or calculated
     # epsilon is the distance to check for neighbours
     # k is the number on the epsilon-neighborhood criterion
@@ -77,23 +77,6 @@ def run(epsilon, k, file, gen, save, printProgress):
 
     tri = Delaunay(points)
 
-    def find_neighbors(pindex, triang):
-        return triang.vertex_neighbor_vertices[1][
-               triang.vertex_neighbor_vertices[0][pindex]:triang.vertex_neighbor_vertices[0][pindex + 1]]
-
-    def find_neighborsFromList(pindexList, triang):
-        output = []
-        for pindex in pindexList:
-            neighbors = find_neighbors(pindex, triang)
-            output = output + neighbors.tolist()
-        return list(set(output))
-
-    def find_neighborsGen(pindex, triang, gen):
-        neighbors = find_neighbors(pindex, triang)
-        for i in range(0, gen - 1):
-            neighbors = find_neighborsFromList(neighbors, triang)
-        return neighbors
-
     # Ids
     center = []
     outlier = []
@@ -118,48 +101,22 @@ def run(epsilon, k, file, gen, save, printProgress):
         neighbour_edges.add((i, j))
         neighbourEdge_points.append(raw[[i, j]])
 
-    new = ''
-
-    pythonNeighborMatrix = []
-
-    maxWidth = 0
-
     print("Finished Delaunay Triangulation: " + str(time.clock() - lastTime))
-    print("Creating neighbour matrix")
-    lastTime = time.clock()
 
-
-    for p in range(len(points)):
-        if printProgress:
-            por = str(int((p / l) * 100))
-            if (por != new):
-                new = por
-                print(new + "%")
-        neighborsList = find_neighborsGen(p,tri,gen)
-
-        if len(neighborsList) > maxWidth:
-            maxWidth = len(neighborsList)
-
-        pythonNeighborMatrix.append(neighborsList)
-
-    print("Finished Neighbor matrix: " + str(time.clock() - lastTime))
     print("Creating numpy arrays")
     lastTime = time.clock()
 
     lenP = len(points)
     vector = np.zeros((lenP, 1), cl.array.vec.float2)
-    matrix = np.zeros((lenP, maxWidth), cl.array.vec.int)
 
     for p in range(len(points)):
         vector[p, 0] = (points[p][0], points[p][1])
-        for subP in range(len(pythonNeighborMatrix[p])):
-            matrix[p, subP] = np.int32(pythonNeighborMatrix[p][subP])
 
     print("Finished numpy arrays: " + str(time.clock() - lastTime))
     print("Classifying points in GPU")
     lastTime = time.clock()
 
-    result = clo.runParallel(vector, matrix, k, epsilon, maxWidth)
+    result = clo.runParallelNxN(vector, k, epsilon, lenP)
 
     print("Finished Classifying points in GPU: " + str(time.clock() - lastTime))
     print("Processing data from parallel")
@@ -228,15 +185,15 @@ def run(epsilon, k, file, gen, save, printProgress):
     if removeOutliersFromGraph:
         outlierPointsPython = []
 
-    #benchmarkMem(initM)
+    benchmarkMem(initM)
     print("Finished Adding edges:" + str(time.clock() - lastTime))
     print("Finished!:"+str(time.clock()-start))
 
     if plot:
-        plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(
+        plotName = 'Technique:Parallel ' + ') Data:' + file + ' | epsilon:' + str(
             epsilon) + ' | k:' + str(k)
         if save:
-            plotName = 'TechniqueDelaunay ' + 'Data_' + str(len(points)) + '_epsilon:' + str(epsilon) + '_k:' + str(k)
+            plotName = 'TechniqueParallel ' + 'Data_' + str(len(points)) + '_epsilon:' + str(epsilon) + '_k:' + str(k)
             pp.saveWithEpsilonNeighbourBig('Delaunay', plotName, centerPointsPython, outlierPointsPython,
                                            borderPointsPython,
                                            neighbourEdge_points_center)
@@ -252,13 +209,12 @@ def run(epsilon, k, file, gen, save, printProgress):
 if __name__ == '__main__':
     start = time.clock()
     #define initial used memory in mb
-    #mem = psutil.virtual_memory()
-    #initM = mem.used >> 20
+    mem = psutil.virtual_memory()
+    initM = mem.used >> 20
     run(
-        epsilon=80,
-        k=15,
-        file='Data/30sphere2d_100000.dat',
-        gen=3,
+        epsilon=70,
+        k=19,
+        file='Data/20irr2d_262144.dat',
         save=False,
         printProgress=False
     )
