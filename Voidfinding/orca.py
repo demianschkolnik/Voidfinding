@@ -13,6 +13,8 @@ import time
     #print("mem:"+str(mem))
 
 def run(epsilon, k, file, gen, save, printProgress):
+    print("Running orca on " + str(file) + " with k=" + str(k) + " ,eps=" + str(epsilon), " ,gen="+str(gen))
+    start = time.clock()
     # Manual epsilon or calculated
     # epsilon is the distance to check for neighbours
     # k is the number on the epsilon-neighborhood criterion
@@ -20,6 +22,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     # Generation of neighbors on delaunay
     # save as image?
     # Print % of progress on console?
+
 
     plot = True  # Plot?
     plotNearestNeighbour = True  # Plot lines to epsilon-neighbours?
@@ -222,24 +225,15 @@ def run(epsilon, k, file, gen, save, printProgress):
 
 
 if __name__ == '__main__':
-    start = time.clock()
     #define initial used memory in mb
     #mem = psutil.virtual_memory()
     #initM = mem.used >> 20
+
     run(
         epsilon=1000,
         k=1,
-        file='Data/30sphere2d_100000.dat',
+        file='Data/20irr2d_8192.dat',
         gen=4,
         save=False,
         printProgress=True
     )
-
-    # run(
-    #     epsilon=70,
-    #     k=14,
-    #     file='Data/30sphere2d_100000.dat',
-    #     gen=4,
-    #     save=False,
-    #     printProgress=False
-    # )
