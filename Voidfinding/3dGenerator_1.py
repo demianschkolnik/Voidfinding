@@ -1,5 +1,21 @@
 import random
 
+def run2():
+    count = 0
+    for x in range(-1000,1001,50):
+        for y in range(-1000, 1001,50):
+            for z in range(-1000, 1001,50):
+                count +=1
+    wName = "Data/regular_10_noVoids_" + str(count) + ".dat"
+    fileW = open(wName, "w")
+    fileW.write("3\n")
+    fileW.write(str(count) + "\n")
+    for x in range(-1000,1001,50):
+        for y in range(-1000, 1001,50):
+            for z in range(-1000, 1001,50):
+                fileW.write(str(x) + "\t" + str(y) + "\t" + str(z) + "\n")
+
+
 
 def run(file):
     f = open(file, 'r')
@@ -36,4 +52,5 @@ def run(file):
 
 if __name__ == '__main__':
 
-    run(file = 'Data/20irr2d_8192.dat')
+    #run(file = 'Data/20irr2d_8192.dat')
+    run2()

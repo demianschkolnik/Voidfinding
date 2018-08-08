@@ -12,6 +12,21 @@ import time
     #mem = mem >> 20
     #print("mem:"+str(mem))
 
+def printStuff(centerPointsPython, borderPointsPython, outlierPointsPython):
+
+    print("center")
+    print(str(len(centerPointsPython)))
+    print(centerPointsPython)
+    print("-------")
+    print("border")
+    print(str(len(borderPointsPython)))
+    print(borderPointsPython)
+    print("-------")
+    print("outlier")
+    print(str(len(outlierPointsPython)))
+    print(outlierPointsPython)
+    print("-------")
+
 def run(epsilon, k, file, gen, save, printProgress):
     print("Running orca on " + str(file) + " with k=" + str(k) + " ,eps=" + str(epsilon), " ,gen="+str(gen))
     start = time.clock()
@@ -27,7 +42,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     plot = True  # Plot?
     plotNearestNeighbour = True  # Plot lines to epsilon-neighbours?
 
-    removeOutliersFromGraph = True
+    removeOutliersFromGraph = False
     drawConvexHull = True
 
     def distance6(x1, y1, z1, x2, y2, z2):
@@ -134,6 +149,7 @@ def run(epsilon, k, file, gen, save, printProgress):
         for n in find_neighborsGen(p, tri, gen):
             dist = distance6(points[p][0], points[p][1], points[p][2],
                              points[n][0], points[n][1], points[n][2])
+
             if (dist <= epsilon):
                 nrNeigh += 1
                 # if plotNearestNeighbour:
@@ -151,7 +167,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     for cand in candidates:
         wasBorder = False
         for c in center:
-            if distance4(points[cand][0], points[cand][1], points[cand][2],
+            if distance6(points[cand][0], points[cand][1], points[cand][2],
                          points[c][0], points[c][1], points[c][2]) <= epsilon:
                 border.append(cand)
                 borderPointsPython.append(raw[cand].tolist())
@@ -203,6 +219,8 @@ def run(epsilon, k, file, gen, save, printProgress):
         if (edges_added < 3):
             void_triangles.append((a, b, c))
 
+    print("VOID TRIANGS:" + str(len(void_triangles)))
+
     if drawConvexHull:
         for i in tri.convex_hull:
             add_edge(i[0], i[1], neighbour_edges_center, neighbourEdge_points_center)
@@ -211,23 +229,13 @@ def run(epsilon, k, file, gen, save, printProgress):
         outlierPointsPython = []
 
     #benchmarkMem(initM)
-    print("Finished!:"+str(time.clock()-start))
+    print("Finished!:" + str(time.clock() - start))
+
 
     if plot:
         plotName = 'Technique:Delaunay ' + ' gen(' + str(gen) + ') Data:' + file + ' | epsilon:' + str(
             epsilon) + ' | k:' + str(k)
-        if save:
-            plotName = 'TechniqueDelaunay ' + 'Data_' + str(len(points)) + '_epsilon:' + str(epsilon) + '_k:' + str(k)
-            pp.saveWithEpsilonNeighbourBig('Delaunay', plotName, centerPointsPython, outlierPointsPython,
-                                           borderPointsPython,
-                                           neighbourEdge_points_center)
-        elif plotNearestNeighbour:
-            pp.plotWithEpsilonNeighbour2Edges(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
-                                              neighbourEdge_points_center, neighbourEdge_points_border, void_triangles,
-                                              color1='black', color2='black', color3='black',
-                                              color4='none', color5='none')
-        else:
-            pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
+        pp.plot3d(plotName, centerPointsPython, borderPointsPython, outlierPointsPython, void_triangles)
 
 
 if __name__ == '__main__':
@@ -236,8 +244,8 @@ if __name__ == '__main__':
     #initM = mem.used >> 20
 
     run(
-        epsilon=70,
-        k=19,
+        epsilon=200,
+        k=10,
         file='Data/8sphere3d_r500_f500_4060.dat',
         gen=4,
         save=False,

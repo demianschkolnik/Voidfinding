@@ -1,8 +1,13 @@
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
+jet = plt.get_cmap('jet')
+from matplotlib import animation
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
 
 
 def plot(name, centerPointsPython, outlierPointsPython, borderPointsPython):
@@ -194,3 +199,42 @@ def saveWithEpsilonNeighbourNoLabels(folderName, name, points, edges):
 
     saveFile = 'Figures/' + folderName + '/' + name + '.png'
     plt.savefig(saveFile, bbox_inches='tight', dpi=400)
+
+def plot3d(name, centerPointsPython, borderPointsPython, outlierPointsPython, voidTriangles):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    if centerPointsPython:
+        centerPoints = np.array(centerPointsPython)
+        x, y, z = centerPoints[:, 0], centerPoints[:, 1], centerPoints[:, 2]
+        ax.scatter(x, y, -z, zdir='z', c='black', depthshade=False, s=1, marker='.')
+    if borderPointsPython:
+        borderPoints = np.array(borderPointsPython)
+        x, y, z = borderPoints[:, 0], borderPoints[:, 1], borderPoints[:, 2]
+        ax.scatter(x, y, -z, zdir='z', c='blue', depthshade=False, s=1, marker='.')
+    if outlierPointsPython:
+        outlierPoints = np.array(outlierPointsPython)
+        x, y, z = outlierPoints[:, 0], outlierPoints[:, 1], outlierPoints[:, 2]
+        ax.scatter(x, y, -z, zdir='z', c='red', depthshade=False, s=1, marker='.')
+
+    cleanedTriangles = []
+    limit = 900
+    for t in voidTriangles:
+        isborder = False
+        for p in t:
+            if abs(p[0])>limit or abs(p[1])>limit or abs(p[2])>limit:
+                isborder = True
+        if not isborder:
+            cleanedTriangles.append(t)
+
+    ax.add_collection3d(Poly3DCollection(cleanedTriangles, alpha=0.2), zs='z')
+
+    #plt.show()
+
+    def rotate(angle):
+        ax.view_init(azim=angle)
+
+    print("Making animation")
+    rot_animation = animation.FuncAnimation(fig, rotate, frames=np.arange(0, 362, 2), interval=100)
+    rot_animation.save('rotation2.gif', dpi=80, writer='imagemagick')
+
