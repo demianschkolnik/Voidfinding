@@ -116,6 +116,7 @@ def run(epsilon, k, file, save, printProgress):
     print("Classifying points in GPU")
     lastTime = time.clock()
 
+    #Run parallel
     result = clo.runParallelNxN(vector, k, epsilon, lenP)
 
     print("Finished Classifying points in GPU: " + str(time.clock() - lastTime))
