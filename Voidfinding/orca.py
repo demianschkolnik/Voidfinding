@@ -230,10 +230,18 @@ if __name__ == '__main__':
     #initM = mem.used >> 20
 
     run(
-        epsilon=1000,
-        k=1,
-        file='Data/20irr2d_8192.dat',
+        epsilon=80,
+        k=15,
+        file='Data/20irr2d_16384.dat',
         gen=4,
         save=False,
         printProgress=True
     )
+    # run(
+    #     epsilon=1000,
+    #     k=1,
+    #     file='Data/20irr2d_16384.dat',
+    #     gen=4,
+    #     save=False,
+    #     printProgress=True
+    # )
