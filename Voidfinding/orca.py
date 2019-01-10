@@ -27,7 +27,7 @@ def run(epsilon, k, file, gen, save, printProgress):
     plot = True  # Plot?
     plotNearestNeighbour = True  # Plot lines to epsilon-neighbours?
 
-    removeOutliersFromGraph = True
+    removeOutliersFromGraph = False
     drawConvexHull = True
 
     def distance4(x1, y1, x2, y2):
@@ -108,6 +108,9 @@ def run(epsilon, k, file, gen, save, printProgress):
     neighbourEdge_points_border = []
     neighbour_edges_border = set()
 
+    delaunayPlot_points = []
+    delaunayPlot_edges = set()
+
     def add_edge(i, j, neighbour_edges, neighbourEdge_points):
         """Add a line between the i-th and j-th points, if not in the list already"""
         if (i, j) in neighbour_edges or (j, i) in neighbour_edges:
@@ -162,12 +165,18 @@ def run(epsilon, k, file, gen, save, printProgress):
     print("Adding Edges"+str(time.clock()-start))
 
     for t in tri.simplices:
+
         if printProgress:
             por = str(int((p / len(tri.simplices)) * 100))
             if (por != new):
                 new = por
                 print(new + "%")
             p += 1
+
+        add_edge(t[0],t[1],delaunayPlot_edges,delaunayPlot_points)
+        add_edge(t[1], t[2], delaunayPlot_edges, delaunayPlot_points)
+        add_edge(t[0], t[2], delaunayPlot_edges, delaunayPlot_points)
+
 
         edges_added = 0
         if t[0] < 0 or t[1] < 0 or t[2] < 0 or t[0] >= len(points) or t[1] >= len(points) or t[2] >= len(points):
@@ -204,6 +213,8 @@ def run(epsilon, k, file, gen, save, printProgress):
     if removeOutliersFromGraph:
         outlierPointsPython = []
 
+
+
     #benchmarkMem(initM)
     print("Finished!:"+str(time.clock()-start))
 
@@ -216,10 +227,13 @@ def run(epsilon, k, file, gen, save, printProgress):
                                            borderPointsPython,
                                            neighbourEdge_points_center)
         elif plotNearestNeighbour:
+            #colors: borderpoints, centerpoints, outlierpoints,
+            # neighborEdgesCenter, neighborEdgesBorder, triangles, delaunayTriangulation
             pp.plotWithEpsilonNeighbour2Edges(plotName, centerPointsPython, outlierPointsPython, borderPointsPython,
                                               neighbourEdge_points_center, neighbourEdge_points_border, void_triangles,
-                                              color1='black', color2='black', color3='black',
-                                              color4='none', color5='none')
+                                              delaunayPlot_points,
+                                              color1='green', color2='black', color3='red',
+                                              color4='none', color5='none', color6='none', color7='none')
         else:
             pp.plot(plotName, centerPointsPython, outlierPointsPython, borderPointsPython)
 
@@ -230,9 +244,9 @@ if __name__ == '__main__':
     #initM = mem.used >> 20
 
     run(
-        epsilon=80,
-        k=15,
-        file='Data/20irr2d_16384.dat',
+        epsilon=60,
+        k=22,
+        file='Data/20irr2d_8192.dat',
         gen=4,
         save=False,
         printProgress=True

@@ -10,7 +10,7 @@ plot = True #Plot?
 plotNearestNeighbour = True #Plot lines to epsilon-neighbours?
 printProgress = True #Print % of progress on console?
 justPlotBorder = False
-justPlotCenter = True
+justPlotCenter = False
 
 
 #Parse de read data
@@ -67,6 +67,7 @@ def add_edge(i, j, data):
 
 new = ''
 #check for center objects.
+print("Cheking for center objects")
 for i in range(0,l):
    if printProgress:
        por =  str(int((i/l)*100))
@@ -98,6 +99,7 @@ for i in range(0,l):
 
 #plot just centers
 if justPlotCenter:
+    print("Plotting centers")
     tree2 = spatial.KDTree(centerPointsPython)
     for j in range(0,len(centerPointsPython)):
         if printProgress:

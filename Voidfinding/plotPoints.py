@@ -58,8 +58,9 @@ def plotWithEpsilonNeighbour(name, centerPointsPython, outlierPointsPython, bord
     plt.show()
 
 def plotWithEpsilonNeighbour2Edges(name, centerPointsPython, outlierPointsPython, borderPointsPython, edge_points1,
-                                   edge_points2, polygons,
-                                   color1='blue', color2='cyan', color3='green', color4='black', color5='red'):
+                                   edge_points2, polygons, triangulation,
+                                   color1='blue', color2='cyan', color3='green',
+                                   color4='black', color5='red', color6='gray', color7='none'):
     centerPointsNP = np.array(centerPointsPython)
     outlierPointsNP = np.array(outlierPointsPython)
     borderPointsNP = np.array(borderPointsPython)
@@ -67,11 +68,11 @@ def plotWithEpsilonNeighbour2Edges(name, centerPointsPython, outlierPointsPython
     plt.figure()
     plt.title(name)
     if len(borderPointsNP) > 0 and color1!='none':
-        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], '.', markersize=0.5, color=color1)
+        plt.plot(borderPointsNP[:, 0], borderPointsNP[:, 1], '.', markersize=3, color=color1)
     if len(centerPointsNP) > 0 and color2!='none':
-        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], '.', markersize=0.5, color=color2)
+        plt.plot(centerPointsNP[:, 0], centerPointsNP[:, 1], '.', markersize=3, color=color2)
     if len(outlierPointsNP) > 0 and color3!='none':
-        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], '.', markersize=0.5, color=color3)
+        plt.plot(outlierPointsNP[:, 0], outlierPointsNP[:, 1], 'x', markersize=3, color=color3)
 
     if color4!='none':
         lines = LineCollection(edge_points1, color=color4, linewidths=0.2)
@@ -81,13 +82,19 @@ def plotWithEpsilonNeighbour2Edges(name, centerPointsPython, outlierPointsPython
         lines2 = LineCollection(edge_points2, color=color5, linewidths=0.5)
         plt.gca().add_collection(lines2)
 
-    patches = []
-    for p in polygons:
-        polygon = Polygon(p, True)
-        patches.append(polygon)
+    if color7!= 'none':
+        lines3 = LineCollection(triangulation,color=color7, linewidths=0.2)
+        plt.gca().add_collection(lines3)
 
-    p = PatchCollection(patches, alpha=0.4)
-    plt.gca().add_collection(p)
+    if color6 != 'none':
+        patches = []
+        for p in polygons:
+            polygon = Polygon(p, True)
+            patches.append(polygon)
+
+        p = PatchCollection(patches, alpha=0.4)
+        p.set_color(color6)
+        plt.gca().add_collection(p)
 
     # x1 = [-100, 120]
     # y1 = [100, 400]
